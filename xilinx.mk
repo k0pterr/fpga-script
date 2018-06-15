@@ -48,36 +48,40 @@ endif
 IP_LIB_DIR          := $(abspath $(IP_LIB_DIR))
 SRC_DIR             := $(abspath $(SRC_DIR))
 LIB_DIR             := $(abspath $(LIB_DIR))
-OUT_DIR             := $(call fixPath, $(OUT_DIR))
+#OUT_DIR             := $(call fixPath, $(OUT_DIR))
 PLATFORM_BUILD_DIR  := $(call fixPath, $(PLATFORM_BUILD_DIR))
 OUT_IP_DIR          := $(call fixPath, $(OUT_IP_DIR))
 BIN_DIR             := $(call fixPath, $(abspath $(BIN_DIR)))
 SCRIPT_DIR          := $(call fixPath, $(abspath $(SCRIPT_DIR)))
 
 #------------------------------------------------------------------------------
-PRJ_FILE_CMD_LINE := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-prj.jou -log $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-prj.log -source $(SCRIPT_DIR)/$(PRJ_GEN_SCRIPT) -notrace
-OUT_FILE_CMD_LINE := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-out.jou -log $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-out.log -source $(SCRIPT_DIR)/$(OUT_GEN_SCRIPT) -notrace
-DEV_PGM_CMD_LINE  := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-pgm.jou -log $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-pgm.log -source $(SCRIPT_DIR)/$(DEV_PGM_SCRIPT) -notrace
+PRJ_FILE_CMD_LINE := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-prj.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-prj.log -source $(SCRIPT_DIR)/$(PRJ_GEN_SCRIPT) -notrace
+OUT_FILE_CMD_LINE := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-out.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-out.log -source $(SCRIPT_DIR)/$(OUT_GEN_SCRIPT) -notrace
+DEV_PGM_CMD_LINE  := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-pgm.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-pgm.log -source $(SCRIPT_DIR)/$(DEV_PGM_SCRIPT) -notrace
 
 #---
 define ip_bld_cmd
  $(SHELL_DIR)/$(PRJ_SHELL)\
   -mode batch\
-  -journal $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-ip-$(patsubst %.tcl,%,$(notdir $(1))).jou\
-  -log     $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-ip-$(patsubst %.tcl,%,$(notdir $(1))).log\
+  -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-ip-$(patsubst %.tcl,%,$(notdir $(1))).jou\
+  -log     $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-ip-$(patsubst %.tcl,%,$(notdir $(1))).log\
   -source  $(SCRIPT_DIR)/$(IP_BLD_SCRIPT)\
   -notrace
 endef
 
 #------------------------------------------------------------------------------
-ifndef PRJ_NAME
-    PRJ_NAME := $(notdir $(SRC_DIR))
-endif
+#ifndef PRJ_NAME
+#    PRJ_NAME := $(notdir $(SRC_DIR))
+#endif
 
 #------------------------------------------------------------------------------
-PRJ_FILE_NAME    := $(PRJ_NAME)-$(CFG_NAME)
-OUT_FILE_NAME    := $(PRJ_NAME)
-TARGET_FILE_NAME := $(PRJ_NAME)-$(CFG_NAME)
+#PRJ_FILE_NAME    := $(PRJ_NAME)-$(CFG_NAME)
+#OUT_FILE_NAME    := $(PRJ_NAME)
+#TARGET_FILE_NAME := $(PRJ_NAME)-$(CFG_NAME)
+
+PRJ_FILE_NAME    := $(CFG_NAME)
+OUT_FILE_NAME    := $(TOP_NAME)
+TARGET_FILE_NAME := $(CFG_NAME)
 
 
 #------------------------------------------------------------------------------
@@ -87,7 +91,7 @@ CFG_IP         := $(abspath $(CFG_IP))
 
 SRC_DEPS       := $(call fixPath, $(SRC)) $(call fixPath, $(INC)) $(call fixPath, $(SDC))
 PRJ_FILE       := $(call fixPath, $(abspath $(PLATFORM_BUILD_DIR)/$(PRJ_FILE_NAME).xpr)) 
-OUT_FILE       := $(call fixPath, $(abspath $(PLATFORM_BUILD_DIR)/$(PRJ_NAME)-$(CFG_NAME).runs/impl_1/$(OUT_FILE_NAME).bit))
+OUT_FILE       := $(call fixPath, $(abspath $(PLATFORM_BUILD_DIR)/$(CFG_NAME).runs/impl_1/$(OUT_FILE_NAME).bit))
 TRG_FILE       := $(call fixPath, $(abspath $(BIN_DIR)/$(TARGET_FILE_NAME).bit))
 
 CMD_DEPS     := $(SCRIPT_DIR)/xilinx.mk makefile
@@ -123,7 +127,7 @@ ifeq ($(detected_OS),Windows)
 
 #---------------------------
 dev_pgm: $(TRG_FILE) $(CMD_DEPS_PRG)
-	@if exist $(PLATFORM_BUILD_DIR)\$(PRJ_NAME)-pgm* del /Q/ F $(PLATFORM_BUILD_DIR)\$(PRJ_NAME)-pgm*
+	@if exist $(PLATFORM_BUILD_DIR)\$(CFG_NAME)-pgm* del /Q/ F $(PLATFORM_BUILD_DIR)\$(CFG_NAME)-pgm*
 	$(SHELL_DIR)/$(PGM_SHELL) $(DEV_PGM_CMD_LINE) -tclargs $(TRG_BOARD) $(TRG_DEVICE) $(TRG_FILE)
 	@if exist .Xil rmdir /s/q .Xil
 
@@ -159,7 +163,7 @@ else
 
 #---------------------------
 dev_pgm: $(TRG_FILE) $(CMD_DEPS_PRG)
-	rm -rf $(PLATFORM_BUILD_DIR)\$(PRJ_NAME)-pgm*
+	rm -rf $(PLATFORM_BUILD_DIR)\$(CFG_NAME)-pgm*
 	$(SHELL_DIR)/$(PGM_SHELL) $(DEV_PGM_CMD_LINE) -tclargs $(TRG_BOARD) $(TRG_DEVICE) $(TRG_FILE)
 	rm -rf .Xil
 
@@ -168,7 +172,8 @@ clean:
 	rm -rf $(PLATFORM_BUILD_DIR) $(TRG_FILE) $(CFG_DIR)/.Xil $(CFG_DIR)/*jou $(CFG_DIR)/*log
 
 clean_all:
-	rm -rf $(OUT_DIR) $(BIN_DIR)
+	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	#rm -rf $(OUT_DIR) $(BIN_DIR)
 
 #---------------------------
 $(TRG_FILE): $(OUT_FILE)
@@ -177,7 +182,7 @@ $(TRG_FILE): $(OUT_FILE)
 	rm -rf .Xil
 
 $(OUT_FILE): $(PRJ_FILE) $(CMD_DEPS) $(CMD_DEPS_BLD) $(CMD_DEPS_PRJ)
-	rm -rf $(PLATFORM_BUILD_DIR)\$(PRJ_NAME)-out*
+	rm -rf $(PLATFORM_BUILD_DIR)\$(CFG_NAME)-out*
 	$(SHELL_DIR)/$(PRJ_SHELL) $(OUT_FILE_CMD_LINE) -tclargs $(PLATFORM_BUILD_DIR) $(PRJ_FILE_NAME)
 
 #---------------------------
@@ -194,8 +199,9 @@ test:
 	@echo test $(TARGET_FILE_NAME)	
 
 #---------------------------
-$(PRJ_FILE): $(SRC_DEPS) $(CMD_DEPS) $(CMD_DEPS_PRJ) $(OUT_IP) | $(OUT_DIR) $(PLATFORM_BUILD_DIR)
-	$(SHELL_DIR)/$(PRJ_SHELL) $(PRJ_FILE_CMD_LINE) -tclargs $(SCRIPT_DIR) $(SRC_DIR) $(PLATFORM_BUILD_DIR) $(PRJ_NAME) $(TARGET_FILE_NAME) $(DEVICE) $(LIB_DIR) $(BUILD_TOOL) $(SRC) $(SDC) $(OUT_IP)
+#$(PRJ_FILE): $(SRC_DEPS) $(CMD_DEPS) $(CMD_DEPS_PRJ) $(OUT_IP) | $(OUT_DIR) $(PLATFORM_BUILD_DIR)
+$(PRJ_FILE): $(SRC_DEPS) $(CMD_DEPS) $(CMD_DEPS_PRJ) $(OUT_IP) | $(PLATFORM_BUILD_DIR)
+	$(SHELL_DIR)/$(PRJ_SHELL) $(PRJ_FILE_CMD_LINE) -tclargs $(SCRIPT_DIR) $(SRC_DIR) $(PLATFORM_BUILD_DIR) $(TOP_NAME) $(TARGET_FILE_NAME) $(DEVICE) $(LIB_DIR) $(BUILD_TOOL) $(SRC) $(SDC) $(OUT_IP)
 
 .SECONDEXPANSION:
 PERCENT = %
@@ -203,8 +209,8 @@ $(OUT_IP): % : $$(filter $$(PERCENT)$$(notdir $$*), $$(CFG_IP)).tcl | $(OUT_IP_D
 	$(call ip_bld_cmd, $^ ) -tclargs $^ $@ $(DEVICE) $(IP_LIB_DIR)
 
 #---------------------------
-$(OUT_DIR):
-	mkdir $(OUT_DIR)	
+#$(OUT_DIR):
+#	mkdir $(OUT_DIR)	
 
 # TODO: check 'mkdir -p' for  Windows platform
 $(PLATFORM_BUILD_DIR):
