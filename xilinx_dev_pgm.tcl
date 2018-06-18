@@ -1,6 +1,17 @@
 #*******************************************************************************
 #*******************************************************************************
 
+puts ""
+puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+puts ""
+puts ""
+puts "                                     Program Device"
+puts ""
+puts ""
+puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+puts ""
+
+
 #-----------------------------------
 set DEBUG_INFO 1
 
@@ -28,8 +39,8 @@ if {$TEST_1 == 1} {
        puts "---- hw targets:"
        set idx 0
        foreach trg $hwTargets {
-	incr idx
-	puts "trg $idx: $trg" 
+        incr idx
+        puts "trg $idx: $trg" 
        }
        puts "**************** \[XILINX_DEV_PGM:DEBUG\] TEST-1 (end)\n"
 }
@@ -47,8 +58,8 @@ if {$TEST_2 == 1} {
        puts "---- hw devices (hw target: $hwTarget)"
        set idx 0
        foreach dev $hwDevices {
-	incr idx
-	puts "dev $idx: $dev" 
+        incr idx
+        puts "dev $idx: $dev" 
        }
        puts "**************** \[XILINX_DEV_PGM:DEBUG\] TEST-2 (end)\n"
 }
@@ -68,9 +79,9 @@ close_hw
 
 #-----------------------------------
 if {$DEBUG_INFO == 1} {
-	puts "\[XILINX_DEV_PGM:DEBUG\] TRG_BOARD:  $TRG_BOARD"
-	puts "\[XILINX_DEV_PGM:DEBUG\] TRG_DEVICE: $TRG_DEVICE"
-	puts "\[XILINX_DEV_PGM:DEBUG\] TRG_FILE:   $TRG_FILE"
+        puts "\[XILINX_DEV_PGM:DEBUG\] TRG_BOARD:  $TRG_BOARD"
+        puts "\[XILINX_DEV_PGM:DEBUG\] TRG_DEVICE: $TRG_DEVICE"
+        puts "\[XILINX_DEV_PGM:DEBUG\] TRG_FILE:   $TRG_FILE"
 }
 
 
