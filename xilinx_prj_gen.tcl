@@ -117,7 +117,6 @@ set TOP_NAME          [lindex $argv 3]
 set TARGET_FILE_NAME  [lindex $argv 4]
 set DEVICE            [lindex $argv 5]
 set LIB_DIR           [lindex $argv 6]
-set BUILD_TOOL        [lindex $argv 7]
 
 set PROLOGUE_SCRIPT   "prologue.tcl"
 set SETTINGS_SCRIPT   "settings.tcl"
@@ -133,7 +132,7 @@ source $SCRIPT_DIR/cfg_header_gen.tcl
 set CFG_DIR [pwd]
 
 #-----------------------------------
-set srcFileListStart 8
+set srcFileListStart 7
 set srcFileNum [expr $argc - $srcFileListStart]
 set srcFileList [lrange $argv $srcFileListStart end]
 
@@ -143,7 +142,7 @@ set src_sdc [lsearch -all -inline $srcFileList $sfx_sdc]
 set src_xdc [lsearch -all -inline $srcFileList $sfx_xdc] 
 
 #-----------------------------------
-cfg_header_gen $CFG_DIR $BUILD_TOOL
+cfg_header_gen $CFG_DIR
 
 #-----------------------------------
 if {[file exists ${CFG_DIR}/${PROLOGUE_SCRIPT}] == 1} {
@@ -240,6 +239,5 @@ if {$DEBUG_INFO == 1} {
         puts "\[XILINX_PRJ_GEN:DEBUG\] TARGET_FILE_NAME: $TARGET_FILE_NAME"
         puts "\[XILINX_PRJ_GEN:DEBUG\] DEVICE:           $DEVICE"
         puts "\[XILINX_PRJ_GEN:DEBUG\] LIB_DIR:          $LIB_DIR"
-        puts "\[XILINX_PRJ_GEN:DEBUG\] BUILD_TOOL:       $BUILD_TOOL"
 }
 

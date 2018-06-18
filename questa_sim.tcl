@@ -21,7 +21,6 @@ lappend SrcDirs $Lib $Sim
 set IncDirs [join [list [join ${SrcDirs} "+"] ${CFG_DIR}] "+"]
 
 set PRJ_NAME   {}
-set BUILD_TOOL {}
 
 set VSV_FileList  vsv_src_files.fv;
 set VHDL_FileList vhdl_src_files.fv;
@@ -50,7 +49,7 @@ append vsim_cmd "vsim";
 set vlog_flags {}
 append vlog_flags " -f" " $VSV_FileList";
 if {[info exists WorkLib]} {
-	append vlog_flags " -work $WorkLib";
+        append vlog_flags " -work $WorkLib";
 }
 append vlog_flags " -incr";
 append vlog_flags " +incdir+" "$IncDirs";
@@ -62,7 +61,7 @@ append vlog_flags " -mfcu";          # (?) is it reaaly need?
 set vcom_flags {}
 append vcom_flags " -f" " $VHDL_FileList";
 if {[info exists WorkLib]} {
-	append vcom_flags " -work $WorkLib";
+        append vcom_flags " -work $WorkLib";
 }
 append vcom_flags " -O0";            # -O5
 #append vcom_flags " -refresh";
@@ -73,7 +72,7 @@ set vopt_flags {}
 append vopt_flags " " $DesignName
 append vopt_flags " -o " $OptimizedDesignName;
 if {[info exists WorkLib]} {
-	append vopt_flags " -work $WorkLib";
+        append vopt_flags " -work $WorkLib";
 }
 append vopt_flags " +acc";          # (!) deprecated - see replacements 
 #append vopt_flags " -quiet";
@@ -81,10 +80,10 @@ append vopt_flags " +acc";          # (!) deprecated - see replacements
 #--- vsim
 set vsim_flags {}
 if {[info exists WorkLib]} {
-	append vsim_flags " -lib $WorkLib";
+        append vsim_flags " -lib $WorkLib";
 }
 if {[info exists TimeResolution]} {
-	append vsim_flags " -t $TimeResolution";
+        append vsim_flags " -t $TimeResolution";
 }
 append vsim_flags " -wlf func.wlf";
 append vsim_flags " -quiet";
@@ -99,24 +98,19 @@ append vsim_flags " " $OptimizedDesignName;
 #puts $vsim_flags
 
 #-------------------------------------------------------------------------------
-proc GenCfgFile { CfgDir ScriptDir PrjName BuildTool } {
-	upvar 1 $PrjName  prjName
-	upvar 1 $BuildTool buildTool
-	
-	set cfgMakeFile [open [set fileName "$CfgDir/makefile"] r]
-	while {[gets $cfgMakeFile line] > -1} {
-		if {[regexp {^PRJ_NAME} $line]}  {
-			set prjName [lindex [join $line " "] end];
-			#puts "D: prjName $prjName";
-		}
-		if {[regexp {^BUILD_TOOL} $line]}  {
-			set buildTool [lindex [join $line " "] end];
-			#puts "D: buildTool $buildTool";
-		}
-	}
-	close $cfgMakeFile
-	source $ScriptDir/cfg_header_gen.tcl
-	cfg_header_gen $prjName $CfgDir $buildTool
+proc GenCfgFile { CfgDir ScriptDir PrjName } {
+        upvar 1 $PrjName  prjName
+        
+        set cfgMakeFile [open [set fileName "$CfgDir/makefile"] r]
+        while {[gets $cfgMakeFile line] > -1} {
+                if {[regexp {^PRJ_NAME} $line]}  {
+                        set prjName [lindex [join $line " "] end];
+                        #puts "D: prjName $prjName";
+                }
+        }
+        close $cfgMakeFile
+        source $ScriptDir/cfg_header_gen.tcl
+        cfg_header_gen $prjName $CfgDir
 }
 
 #-------------------------------------------------------------------------------
@@ -238,11 +232,11 @@ proc s { { wave_ena 1 } } {
  SimBegin;
 
  if { $wave_ena != 0} {
-	do $WaveFileName
+        do $WaveFileName
  }
  run -all
  if { $wave_ena != 0} {
-	view wave
+        view wave
  }
 }
 
@@ -251,7 +245,7 @@ proc r { { wave_ena 1 } } {
  restart -force
  run -all
  if { $wave_ena != 0} {
-	view wave
+        view wave
  }
  view transcript
 }
@@ -260,11 +254,11 @@ proc r { { wave_ena 1 } } {
 #-------------------------------------------------------------------------------
 
 #-----------------------------------
-GenCfgFile ${CFG_DIR} ${SCRIPT_DIR} PRJ_NAME BUILD_TOOL
+GenCfgFile ${CFG_DIR} ${SCRIPT_DIR} PRJ_NAME
 
 #-----------------------------------
 if {[file exists ${CFG_DIR}/${PROLOGUE_SCRIPT}] == 1} {
-	source ${CFG_DIR}/${PROLOGUE_SCRIPT}
+        source ${CFG_DIR}/${PROLOGUE_SCRIPT}
 }
 
 if {$argc > 0} {

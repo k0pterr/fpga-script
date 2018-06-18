@@ -1,6 +1,6 @@
 #*******************************************************************************
 #*******************************************************************************
-proc cfg_header_gen {CFG_DIR BUILD_TOOL} {
+proc cfg_header_gen {CFG_DIR} {
         #-----------------------------------
         set DEBUG_INFO 0
 
@@ -24,7 +24,6 @@ proc cfg_header_gen {CFG_DIR BUILD_TOOL} {
         puts $prjDefFile [format "// synopsys translate_on"];
         puts $prjDefFile [format ""];
         puts $prjDefFile [format "`define CFG_NAME_[string toupper [file tail $CFG_DIR]]"];
-        puts $prjDefFile [format "`define BUILD_TOOL_$BUILD_TOOL"];
         puts $prjDefFile [format ""];
         if {[file exists $CFG_PARAMS_FILE] == 1} {
                 puts $prjDefFile [format "//--- user define section"];
