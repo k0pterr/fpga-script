@@ -21,8 +21,8 @@ set OUT_CFG_DIR      [lindex $argv 0]
 set PRJ_FILE_NAME    [lindex $argv 1]
 
 #-----------------------------------
-set CFG_DIR [pwd]
-set REF_SRC_DIR ../..
+#set CFG_DIR [pwd]
+#set REF_SRC_DIR ../..
 
 open_project [file normalize ${OUT_CFG_DIR}/${PRJ_FILE_NAME}]
 

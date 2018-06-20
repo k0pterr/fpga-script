@@ -1,280 +1,195 @@
-#*******************************************************************************
-#*******************************************************************************
-
-
 #-------------------------------------------------------------------------------
-#     Prj Sctructure Settings
+#
+#     QuestaSim build and run stuff
+#
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-set CFG_DIR         "${REF_DIR}/prj/syn/${CfgName}"
+#
+#     Settings
+#
+source handoff.tcl
 
-set PROLOGUE_SCRIPT "prologue.tcl"
+quietly set PROLOGUE_SCRIPT "prologue.tcl"
 
-set WaveFileName    ${DesignName} 
-append WaveFileName "_wave.do"
+quietly set DesignName $TBENCH_NAME
+quietly set WaveFileName    ${DesignName} 
+quietly append WaveFileName "_wave.do"
 
-set SRC_DIR  ${Src}
-set SrcDirs $SRC_DIR
-lappend SrcDirs $Lib $Sim
+quietly set WorkLib $WLIB_NAME
 
-set IncDirs [join [list [join ${SrcDirs} "+"] ${CFG_DIR}] "+"]
+#---------------------------------------------------------------------
+#
+#     Include directories list
+#
+set SrcDirs {}
 
-set PRJ_NAME   {}
+foreach f $Src {
+    lappend SrcDirs [file dirname $f];
+}
 
-set VSV_FileList  vsv_src_files.fv;
-set VHDL_FileList vhdl_src_files.fv;
-
-#-------------------------------------------------------------------------------
-#     Toolchain
-#-------------------------------------------------------------------------------
-
-set MENTOR_DIR [file normalize $env(MENTOR)]
-
+quietly set INC_DIRS [concat ${SrcDirs} ${CFG_DIR} ${SIM_INC_DIRS}]
+quietly set INC_DIRS [lsort -unique $INC_DIRS];
+quietly set IncDirs [join ${INC_DIRS} "+"];
+#---------------------------------------------------------------------
+#
+#     Toolchain 
+#
 set vlog_cmd {}
 set vcom_cmd {}
 set vopt_cmd {}
 set vsim_cmd {}
 
-append vlog_cmd "vlog";
-append vcom_cmd "vcom";
-append vopt_cmd "vopt";
-append vsim_cmd "vsim";
+quietly append vlog_cmd "vlog";
+quietly append vcom_cmd "vcom";
+quietly append vopt_cmd "vopt";
+quietly append vsim_cmd "vsim";
 
-#-------------------------------------------------------------------------------
-#     Options
-#-------------------------------------------------------------------------------
-
-#--- vlog
+#---------------------------------------------------------------------
+#
+#     Tool flags
+#
+#-----------------------------------------------------------
+#
+#     VLOG
+#
 set vlog_flags {}
-append vlog_flags " -f" " $VSV_FileList";
 if {[info exists WorkLib]} {
-        append vlog_flags " -work $WorkLib";
+        quietly append vlog_flags " -work $WorkLib";
 }
-append vlog_flags " -incr";
-append vlog_flags " +incdir+" "$IncDirs";
-append vlog_flags " -sv";
-append vlog_flags " -O0";            # -O5
-append vlog_flags " -mfcu";          # (?) is it reaaly need?
+quietly append vlog_flags " -incr";
+quietly append vlog_flags " +incdir+" "$IncDirs";
+quietly append vlog_flags " -sv";
+quietly append vlog_flags " -mfcu";          # (?) is it reaaly need?
+quietly append vlog_flags " " ${VLOG_FLAGS}
 
-#--- vcom
-set vcom_flags {}
-append vcom_flags " -f" " $VHDL_FileList";
+#-----------------------------------------------------------
+#
+#     VLOG
+#
+quietly set OptimizedDesignName "opt_$DesignName"
+quietly set vopt_flags {}
+quietly append vopt_flags " " $DesignName
+quietly append vopt_flags " -o " $OptimizedDesignName;
 if {[info exists WorkLib]} {
-        append vcom_flags " -work $WorkLib";
+        quietly append vopt_flags " -work $WorkLib";
 }
-append vcom_flags " -O0";            # -O5
-#append vcom_flags " -refresh";
+quietly append vopt_flags " +acc";          # (!) deprecated - see replacements 
+quietly append vopt_flags " " ${VOPT_FLAGS}
 
-#--- vopt
-set OptimizedDesignName "opt_$DesignName"
-set vopt_flags {}
-append vopt_flags " " $DesignName
-append vopt_flags " -o " $OptimizedDesignName;
-if {[info exists WorkLib]} {
-        append vopt_flags " -work $WorkLib";
-}
-append vopt_flags " +acc";          # (!) deprecated - see replacements 
-#append vopt_flags " -quiet";
-
-#--- vsim
+#-----------------------------------------------------------
+#
+#     VSIM
+#
 set vsim_flags {}
 if {[info exists WorkLib]} {
-        append vsim_flags " -lib $WorkLib";
+        quietly append vsim_flags " -lib $WorkLib";
 }
 if {[info exists TimeResolution]} {
-        append vsim_flags " -t $TimeResolution";
+        quietly append vsim_flags " -t $TimeResolution";
 }
-append vsim_flags " -wlf func.wlf";
-append vsim_flags " -quiet";
-append vsim_flags " " $OptimizedDesignName;
-#append vsim_flags " +pulse_r/60";  # (?) WTF
-#append vsim_flags " +pulse_e/1";   # (?) WTF
-#append vsim_flags " -L altera_f";  # for Altera only
-#append vsim_flags " -c";           # run simulator in command-line mode
-
-#puts $vcom_flags
-#puts $vopt_flags
-#puts $vsim_flags
+quietly append vsim_flags " -wlf func.wlf";
+quietly append vsim_flags " -quiet";
+quietly append vsim_flags " " $OptimizedDesignName;
 
 #-------------------------------------------------------------------------------
-proc GenCfgFile { CfgDir ScriptDir PrjName } {
-        upvar 1 $PrjName  prjName
-        
-        set cfgMakeFile [open [set fileName "$CfgDir/makefile"] r]
-        while {[gets $cfgMakeFile line] > -1} {
-                if {[regexp {^PRJ_NAME} $line]}  {
-                        set prjName [lindex [join $line " "] end];
-                        #puts "D: prjName $prjName";
-                }
-        }
-        close $cfgMakeFile
-        source $ScriptDir/cfg_header_gen.tcl
-        cfg_header_gen $prjName $CfgDir
-}
-
-#-------------------------------------------------------------------------------
-proc BuildSrcList { RootDir SrcDirs \
-                    { VSV_FileList  vsv_src_files.fv}  \
-                    { VHDL_FileList vhdl_src_files.fv} \
-                  }                                      {
-
- set Vext     "v";
- set SVext    "sv";
- set VHDL_ext "vhd";
-
- set VSV_SrcFiles  {};
- set VHDL_SrcFiles {};
-
- foreach d $SrcDirs {
-  foreach f [glob -nocomplain -directory $d *.$Vext *.$SVext *.$VHDL_ext] {
-   set NormSrcFile [file normalize $f];
-   if {[file extension $NormSrcFile] == ".vhd"} {
-    lappend VHDL_SrcFiles $NormSrcFile;
-   } else {
-    lappend VSV_SrcFiles $NormSrcFile;
-   }
-  }
- }
-
- set VSV_SrcFiles  [join $VSV_SrcFiles "\n"];
- set VHDL_SrcFiles [join $VHDL_SrcFiles "\n"];
- #regsub -all {[\n]+} $SrcFiles "\n" SrcFiles;    # alternative var
- #regsub -all {^[\n]} $SrcFiles "" SrcFiles;      # alternative var
-
- # puts $VSV_SrcFiles;        # DEBUG
- # puts $VHDL_SrcFiles;       # DEBUG
-
- if { $VSV_SrcFiles != {} } {
-  set fid [open $VSV_FileList w];
-  puts $fid $VSV_SrcFiles;
-  close $fid
- } else {
-  file delete $VSV_FileList;
- }
-
- if { $VHDL_SrcFiles != {} } {
-  set fid [open $VHDL_FileList w];
-  puts $fid $VHDL_SrcFiles;
-  close $fid
- } else {
-  file delete $VHDL_FileList;
- }
-}
-
-#-------------------------------------------------------------------------------
+#
+#     Commands
+#
 proc LaunchCmd { Cmd Args } {
- set io [open "| $Cmd $Args" r]
- puts [read $io];
- if {[catch {close $io} err]} {
-  puts "[file tail $Cmd] report error: $err"
-  return 0;
- }
- return 1;
+    set io [open "| $Cmd $Args" r]
+    puts [read $io];
+    if {[catch {close $io} err]} {
+        puts "[file tail $Cmd] report error: $err"
+        return 0;
+    }
+    return 1;
 }
-
 #-------------------------------------------------------------------------------
 proc Compile {} {
- global REF_DIR SrcDirs;
 
- global VSV_FileList;
- global VHDL_FileList;
+    global vlog_cmd vlog_flags;
+    global vcom_cmd vcom_flags;
+    global vopt_cmd vopt_flags;
+    
+    global Src
 
- global vlog_cmd vlog_flags;
- global vcom_cmd vcom_flags;
- global vopt_cmd vopt_flags;
-
- BuildSrcList ${REF_DIR} ${SrcDirs};
-
- if { [file exists $VSV_FileList] } {
-  if {[LaunchCmd $vlog_cmd $vlog_flags] == 0} {
-   return;
-  }
- }
-
- if { [file exists $VHDL_FileList] } {
-  if {[LaunchCmd $vcom_cmd $vcom_flags] == 0} {
-   return;
-  }
- }
-
- if {[LaunchCmd $vopt_cmd $vopt_flags] == 0} {
-  return;
- }
+    if {[LaunchCmd $vlog_cmd [concat $vlog_flags $Src]] == 0} {
+        return;
+    }
+    
+    if {[LaunchCmd $vopt_cmd $vopt_flags] == 0} {
+        return;
+    }
 }
-
 #-------------------------------------------------------------------------------
 proc SimBegin { } {
- global vsim_cmd vsim_flags;
+    global vsim_cmd vsim_flags;
 
- quit -sim;
+    quit -sim;
 
- global StdArithNoWarnings;
- global NumericStdNoWarnings;
+    global StdArithNoWarnings;
+    global NumericStdNoWarnings;
 
- set cmd [concat $vsim_cmd $vsim_flags];
- eval $cmd
- radix -hex
- log -r *
+    set cmd [concat $vsim_cmd $vsim_flags];
+    eval $cmd
+    radix -hex
+    log -r *
 
- puts "StdArithNoWarnings   = $StdArithNoWarnings"
- puts "NumericStdNoWarnings = $NumericStdNoWarnings"
+    puts "StdArithNoWarnings   = $StdArithNoWarnings"
+    puts "NumericStdNoWarnings = $NumericStdNoWarnings"
 }
 
 #-------------------------------------------------------------------------------
 proc c { } {
- Compile;
+    Compile;
 }
-
 #-------------------------------------------------------------------------------
 proc s { { wave_ena 1 } } {
- global WaveFileName;
- SimBegin;
+    global WaveFileName;
+    SimBegin;
 
- if { $wave_ena != 0} {
+    if { $wave_ena != 0} {
         do $WaveFileName
- }
- run -all
- if { $wave_ena != 0} {
+    }
+    run -all
+    if { $wave_ena != 0} {
         view wave
- }
+    }
 }
-
 #-------------------------------------------------------------------------------
 proc r { { wave_ena 1 } } {
- restart -force
- run -all
- if { $wave_ena != 0} {
+    restart -force
+    run -all
+    if { $wave_ena != 0} {
         view wave
- }
- view transcript
+    }
+    view transcript
 }
-
 #-------------------------------------------------------------------------------
+#
+#     Run service tasks
+#
+source ${SCRIPT_DIR}/cfg_header_gen.tcl
+cfg_header_gen ${CFG_DIR}
 #-------------------------------------------------------------------------------
-
-#-----------------------------------
-GenCfgFile ${CFG_DIR} ${SCRIPT_DIR} PRJ_NAME
-
-#-----------------------------------
 if {[file exists ${CFG_DIR}/${PROLOGUE_SCRIPT}] == 1} {
-        source ${CFG_DIR}/${PROLOGUE_SCRIPT}
+    source ${CFG_DIR}/${PROLOGUE_SCRIPT}
 }
-
+#-------------------------------------------------------------------------------
 if {$argc > 0} {
- set cmd_arg [lindex $argv 0];
+    set cmd_arg [lindex $argv 0];
  
- switch   $cmd_arg {
-  "-c" {
-   puts "Compile project"
-   Compile
-  }
-  default {
-   puts "Unrecognized command $cmd_arg"
-  }
- }
- #puts " Args $argc are: $cmd_arg"
+    switch $cmd_arg {
+        "-c" {
+            puts "Compile project"
+            Compile
+        }
+        default {
+            puts "Unrecognized command $cmd_arg"
+        }
+    }
+    #puts " Args $argc are: $cmd_arg"
 }
-
-
+#-------------------------------------------------------------------------------
 
