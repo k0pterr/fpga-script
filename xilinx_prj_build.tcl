@@ -7,7 +7,7 @@ proc check_status { jobName } {
         error "\[XILINX_PRJ_BUILD:ERROR\] $jobName failed"
     } else {
         puts "\[XILINX_PRJ_BUILD:INFO\] $jobName completed. Ok."
-    }	
+    }   
 }
 
 #*******************************************************************************
@@ -21,8 +21,8 @@ set OUT_CFG_DIR      [lindex $argv 0]
 set PRJ_FILE_NAME    [lindex $argv 1]
 
 #-----------------------------------
-set CFG_DIR [pwd]
-set REF_SRC_DIR ../..
+#set CFG_DIR [pwd]
+#set REF_SRC_DIR ../..
 
 open_project [file normalize ${OUT_CFG_DIR}/${PRJ_FILE_NAME}]
 
@@ -43,19 +43,40 @@ if {$TEST == 1} {
        #puts [list_property $s1]
        #puts "slon: [get_property NAME $s1]"
        foreach prop [list_property $o1] {
-	puts "$prop: [get_property  $prop $o1]" 
+    puts "$prop: [get_property  $prop $o1]" 
        }
        puts "**************** \[XILINX_PRJ_BUILD:DEBUG\] TEST (end)\n"
 }
 #--- TEST (end)
 
-#---
+
+#-------------------------------------------------------------------------------
+puts ""
+puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+puts ""
+puts ""
+puts "                            Run Synthesis: Compiling and Mapping"
+puts ""
+puts ""
+puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+puts ""
+
 reset_run    $synthName
 launch_runs  $synthName -jobs 6    
 wait_on_run  $synthName
 check_status $synthName
 
-#---
+#-------------------------------------------------------------------------------
+puts ""
+puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+puts ""
+puts ""
+puts "                            Run Implementation: Place and Route"
+puts ""
+puts ""
+puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+puts ""
+
 reset_run    $implName
 launch_runs  $implName -jobs 6 -to_step write_bitstream
 wait_on_run  $implName
@@ -66,7 +87,7 @@ close_project
 
 #-----------------------------------
 if {$DEBUG_INFO == 1} {
-	puts "\[XILINX_PRJ_BUILD:DEBUG\] OUT_CFG_DIR:      $OUT_CFG_DIR"
-	puts "\[XILINX_PRJ_BUILD:DEBUG\] PRJ_FILE_NAME:    $PRJ_FILE_NAME"
+    puts "\[XILINX_PRJ_BUILD:DEBUG\] OUT_CFG_DIR:      $OUT_CFG_DIR"
+    puts "\[XILINX_PRJ_BUILD:DEBUG\] PRJ_FILE_NAME:    $PRJ_FILE_NAME"
 }
 
