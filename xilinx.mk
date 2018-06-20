@@ -243,7 +243,7 @@ qs_vlog: $(SIM_HANDOFF) $(SIM_WLIB_DIR)
 #---------------------------------------------------------------------
 qs_gui:
 	@echo Questa Sim GUI
-	cd $(PLATFORM_FSIM_DIR) && vsim -gui -do $(SCRIPT_DIR)/qs_compile.tcl
+	cd $(PLATFORM_FSIM_DIR) && $(MENTOR)/questa.sh -gui -do $(SCRIPT_DIR)/questa_sim.tcl
 	
 #---------------------------------------------------------------------
 qs_sim:
