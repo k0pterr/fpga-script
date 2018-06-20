@@ -96,7 +96,7 @@ quietly append vsim_flags " " $OptimizedDesignName;
 #
 #     Commands
 #
-proc LaunchCmd { Cmd Args } {
+proc launch_cmd { Cmd Args } {
     set io [open "| $Cmd $Args" r]
     puts [read $io];
     if {[catch {close $io} err]} {
@@ -106,7 +106,7 @@ proc LaunchCmd { Cmd Args } {
     return 1;
 }
 #-------------------------------------------------------------------------------
-proc Compile {} {
+proc compile {} {
 
     global vlog_cmd vlog_flags;
     global vcom_cmd vcom_flags;
@@ -114,16 +114,16 @@ proc Compile {} {
     
     global Src
 
-    if {[LaunchCmd $vlog_cmd [concat $vlog_flags $Src]] == 0} {
+    if {[launch_cmd $vlog_cmd [concat $vlog_flags $Src]] == 0} {
         return;
     }
     
-    if {[LaunchCmd $vopt_cmd $vopt_flags] == 0} {
+    if {[launch_cmd $vopt_cmd $vopt_flags] == 0} {
         return;
     }
 }
 #-------------------------------------------------------------------------------
-proc SimBegin { } {
+proc sim_begin { } {
     global vsim_cmd vsim_flags;
 
     quit -sim;
@@ -142,12 +142,12 @@ proc SimBegin { } {
 
 #-------------------------------------------------------------------------------
 proc c { } {
-    Compile;
+    compile;
 }
 #-------------------------------------------------------------------------------
 proc s { { wave_ena 1 } } {
     global WaveFileName;
-    SimBegin;
+    sim_begin;
 
     if { $wave_ena != 0} {
         do $WaveFileName
