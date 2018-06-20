@@ -145,26 +145,46 @@ proc c { } {
     compile;
 }
 #-------------------------------------------------------------------------------
-proc s { { wave_ena 1 } } {
-    global WaveFileName;
+proc s { { res empty} { wave_ena 1 } } {
+    
+    global CFG_DIR
+    
+    set res_name ${CFG_DIR}/sim/${res}
+    
     sim_begin;
 
-    if { $wave_ena != 0} {
-        do $WaveFileName
+    if {[file exists ${res_name}]} {    
+        do ${res_name}
     }
+        
     run -all
-    if { $wave_ena != 0} {
+
+    if { $wave_ena != 0 } {
         view wave
     }
+    view transcript
 }
 #-------------------------------------------------------------------------------
 proc r { { wave_ena 1 } } {
     restart -force
     run -all
-    if { $wave_ena != 0} {
+
+    if { $wave_ena != 0 } {
         view wave
     }
     view transcript
+}
+#-------------------------------------------------------------------------------
+proc show_res { res } {
+    global CFG_DIR
+
+    set res_name ${CFG_DIR}/sim/${res}
+
+    if {[file exists ${res_name}]} {    
+        do ${res_name}
+    } else {
+        puts "E: result script file does not exist"
+    }
 }
 #-------------------------------------------------------------------------------
 #
