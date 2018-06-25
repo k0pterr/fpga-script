@@ -65,17 +65,18 @@ quietly append vlog_flags " " ${VLOG_FLAGS}
 
 #-----------------------------------------------------------
 #
-#     VLOG
+#     VOPT
 #
 quietly set OptimizedDesignName "opt_$DesignName"
 quietly set vopt_flags {}
-quietly append vopt_flags " " $DesignName
-quietly append vopt_flags " -o " $OptimizedDesignName;
 if {[info exists WorkLib]} {
-        quietly append vopt_flags " -work $WorkLib";
+    quietly append vopt_flags " -work $WorkLib";
 }
 quietly append vopt_flags " +acc";          # (!) deprecated - see replacements 
 quietly append vopt_flags " " ${VOPT_FLAGS}
+quietly append vopt_flags " " $DesignName 
+quietly append vopt_flags " -o " $OptimizedDesignName;
+
 
 #-----------------------------------------------------------
 #

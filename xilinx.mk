@@ -3,19 +3,22 @@
 #     Xilinx-oriented designs build script
 #
 #-------------------------------------------------------------------------------
-CFG_DIR         := $(CURDIR)
-CFG_NAME        := $(notdir $(CURDIR))
-
-SCRIPT_DIR      := $(REF_DIR)/script
-BIN_DIR         := $(REF_DIR)/bin
-IP_LIB_DIR      := $(REF_DIR)/ip/xilinx
-LIB_DIR         := $(REF_DIR)/lib
+CFG_DIR            := $(CURDIR)
+CFG_NAME           := $(notdir $(CURDIR))
+				   
+SCRIPT_DIR         := $(REF_DIR)/script
+BIN_DIR            := $(REF_DIR)/bin
+IP_LIB_DIR         := $(REF_DIR)/ip/xilinx
+LIB_DIR            := $(REF_DIR)/lib
 
 PLATFORM_BUILD_DIR := $(abspath $(BUILD_DIR)/syn/$(CFG_NAME))
 PLATFORM_FSIM_DIR  := $(abspath $(BUILD_DIR)/sim/func/$(CFG_NAME))
 SIM_WLIB_DIR       := $(PLATFORM_FSIM_DIR)/$(SIM_WLIB_NAME)
 OUT_IP_DIR         := $(PLATFORM_BUILD_DIR)/.ip
-			 
+
+SRC_SIM            := $(SRC_SIM) $(XILINX_VIVADO)/data/verilog/src/glbl.v
+VOPT_FLAGS         := $(VOPT_FLAGS) glbl
+
 SIM_HANDOFF        := handoff.tcl			 
 #-------------------------------------------------------------------------------
 IP_BLD_SCRIPT  := xilinx_ip_bld.tcl
@@ -220,7 +223,7 @@ $(SIM_WLIB_DIR): $(CMD_DEPS) | $(PLATFORM_FSIM_DIR)
 	@if [ -e  $(SIM_WLIB_DIR) ]; then rm -rf $(SIM_WLIB_DIR); fi;
 	@if [ -e  $(PLATFORM_FSIM_DIR)/modelsim.ini ]; then rm $(PLATFORM_FSIM_DIR)/modelsim.ini; fi;
 	@vlib $(SIM_WLIB_DIR)
-	@cd $(PLATFORM_FSIM_DIR); vmap -c $(SIM_WLIB_NAME) $(SIM_WLIB_DIR); cd $(CURDIR)
+	@cd $(PLATFORM_FSIM_DIR); vmap -c; vmap $(SIM_WLIB_NAME) $(SIM_WLIB_DIR); cd $(CURDIR)
 
 #---------------------------------------------------------------------
 $(SIM_HANDOFF): | $(PLATFORM_FSIM_DIR)
@@ -233,8 +236,8 @@ $(SIM_HANDOFF): | $(PLATFORM_FSIM_DIR)
 	@echo set WLIB_NAME {$(SIM_WLIB_NAME)}                                       >> $(PLATFORM_FSIM_DIR)/handoff.tcl
 	@echo set Src          [list $(foreach f, $(SRC_SIM), {$(abspath $f)})]      >> $(PLATFORM_FSIM_DIR)/handoff.tcl
 	@echo set SIM_INC_DIRS [list $(foreach d, $(SIM_INC_DIRS), {$(abspath $d)})] >> $(PLATFORM_FSIM_DIR)/handoff.tcl
-	@echo set VLOG_FLAGS   [list $(foreach f, $(VLOG_FLAGS), {$f)}]  		     >> $(PLATFORM_FSIM_DIR)/handoff.tcl
-	@echo set VOPT_FLAGS   [list $(foreach f, $(VOPT_FLAGS), {$f)}]  		     >> $(PLATFORM_FSIM_DIR)/handoff.tcl
+	@echo set VLOG_FLAGS   [list $(foreach f, $(VLOG_FLAGS), {$f})]              >> $(PLATFORM_FSIM_DIR)/handoff.tcl
+	@echo set VOPT_FLAGS   [list $(foreach f, $(VOPT_FLAGS), {$f})]              >> $(PLATFORM_FSIM_DIR)/handoff.tcl
 
 #---------------------------------------------------------------------
 qs_vlog: $(SIM_HANDOFF) $(SIM_WLIB_DIR)
