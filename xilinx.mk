@@ -184,6 +184,7 @@ $(PRJ_FILE): $(CMD_DEPS) $(CMD_DEPS_PRJ) $(OUT_IP) | $(PLATFORM_BUILD_DIR)
 .SECONDEXPANSION:
 PERCENT = %
 $(OUT_IP): % : $$(filter $$(PERCENT)$$(notdir $$*), $$(CFG_IP)).tcl | $(OUT_IP_DIR)/simlib
+	@echo Generate IP cores
 	$(call ip_bld_cmd, $^ ) -tclargs $^ $@ $(DEVICE) $(IP_LIB_DIR)
 	cd $(OUT_IP_DIR); $(SIM_SHELL) -c -do $(IP_LIB_DIR)/$(notdir $*)/compile_simlib.do
 
@@ -209,7 +210,7 @@ $(PLATFORM_FSIM_DIR):
 	mkdir -p $(PLATFORM_FSIM_DIR)	
 	
 #---------------------------------------------------------------------
-$(SIM_WLIB_DIR): $(CMD_DEPS) | $(PLATFORM_FSIM_DIR)
+$(SIM_WLIB_DIR): $(CMD_DEPS) $(OUT_IP) | $(PLATFORM_FSIM_DIR)
 	@echo Create work library $(SIM_WLIB_DIR)
 	@if [ -e  $(SIM_WLIB_DIR) ]; then rm -rf $(SIM_WLIB_DIR); fi;
 	@if [ -e  $(PLATFORM_FSIM_DIR)/modelsim.ini ]; then rm $(PLATFORM_FSIM_DIR)/modelsim.ini; fi;
