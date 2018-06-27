@@ -8,7 +8,7 @@
 #
 #     Settings
 #
-source handoff.tcl
+source handoff.do
 
 quietly set PROLOGUE_SCRIPT "prologue.tcl"
 
