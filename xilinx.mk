@@ -17,7 +17,7 @@ BIN_DIR            := $(REF_DIR)/bin
 BUILD_DIR          := $(REF_DIR)/build
 
 PLATFORM_BUILD_DIR := $(abspath $(BUILD_DIR)/syn/$(CFG_NAME))
-PLATFORM_FSIM_DIR  := $(abspath $(BUILD_DIR)/sim/func/$(CFG_NAME))
+PLATFORM_FSIM_DIR  := $(abspath $(BUILD_DIR)/sim/$(CFG_NAME)/func)
 SIM_WLIB_DIR       := $(PLATFORM_FSIM_DIR)/$(SIM_WLIB_NAME)
 OUT_IP_DIR         := $(PLATFORM_BUILD_DIR)/.ip
 
