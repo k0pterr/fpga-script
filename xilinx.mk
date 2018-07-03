@@ -186,7 +186,7 @@ PERCENT = %
 $(OUT_IP): % : $$(filter $$(PERCENT)$$(notdir $$*), $$(CFG_IP)).tcl | $(OUT_IP_DIR)/simlib
 	@echo Generate IP cores
 	$(call ip_bld_cmd, $^ ) -tclargs $^ $@ $(DEVICE) $(IP_LIB_DIR)
-	cd $(OUT_IP_DIR); $(SIM_SHELL) -c -do $(IP_LIB_DIR)/$(notdir $*)/compile_simlib.do
+	cd $(OUT_IP_DIR); $(SIM_SHELL) -c -do "set IP_LIB_DIR $(IP_LIB_DIR)" -do $<
 
 #---------------------------
 $(PLATFORM_BUILD_DIR):
