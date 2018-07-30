@@ -198,12 +198,13 @@ $(PLATFORM_BUILD_DIR):
 #
 IP_SIMLIB_NAME := ip_simlib
 SRC_SIM        += $(XILINX_VIVADO)/data/verilog/src/glbl.v
-VOPT_FLAGS     += glbl
 
 ifneq ($(strip $(CFG_IP) ),)
 MAP_IP_SIMLIB_CMD := vmap $(IP_SIMLIB_NAME) $(OUT_IP_DIR)/simlib;
 VOPT_FLAGS += -L $(IP_SIMLIB_NAME)
 endif
+
+VOPT_FLAGS += glbl
 
 $(PLATFORM_FSIM_DIR):
 	@echo Create sim dir
