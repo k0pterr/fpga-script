@@ -135,7 +135,7 @@ proc sim_begin { } {
     set cmd [concat $vsim_cmd $vsim_flags];
     eval $cmd
     radix -hex
-    log -r *
+    log -r /*
 
     puts "StdArithNoWarnings   = $StdArithNoWarnings"
     puts "NumericStdNoWarnings = $NumericStdNoWarnings"
