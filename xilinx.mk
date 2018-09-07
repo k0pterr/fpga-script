@@ -27,10 +27,11 @@ SIM_HANDOFF        := handoff.do
 #
 #     Tool scripts
 #
-IP_BLD_SCRIPT  := xilinx_ip_bld.tcl
-PRJ_GEN_SCRIPT := xilinx_prj_gen.tcl
-OUT_GEN_SCRIPT := xilinx_prj_build.tcl
-DEV_PGM_SCRIPT := xilinx_dev_pgm.tcl
+IP_BLD_SCRIPT     := xilinx_ip_bld.tcl
+PRJ_GEN_SCRIPT    := xilinx_prj_gen.tcl
+OUT_GEN_SCRIPT    := xilinx_prj_build.tcl
+DEV_PGM_SCRIPT    := xilinx_dev_pgm.tcl
+CFGMEM_PGM_SCRIPT := xilinx_cfgmem_pgm.tcl
 
 #-------------------------------------------------------------------------------
 #
@@ -72,9 +73,10 @@ SCRIPT_DIR          := $(call fixPath,$(abspath $(SCRIPT_DIR)))
 #
 #     Synthesizer shell command-lines
 #
-PRJ_FILE_CMD_LINE := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-prj.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-prj.log -source $(SCRIPT_DIR)/$(PRJ_GEN_SCRIPT) -notrace
-OUT_FILE_CMD_LINE := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-out.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-out.log -source $(SCRIPT_DIR)/$(OUT_GEN_SCRIPT) -notrace
-DEV_PGM_CMD_LINE  := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-pgm.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-pgm.log -source $(SCRIPT_DIR)/$(DEV_PGM_SCRIPT) -notrace
+PRJ_FILE_CMD_LINE   := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-prj.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-prj.log -source $(SCRIPT_DIR)/$(PRJ_GEN_SCRIPT) -notrace
+OUT_FILE_CMD_LINE   := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-out.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-out.log -source $(SCRIPT_DIR)/$(OUT_GEN_SCRIPT) -notrace
+DEV_PGM_CMD_LINE    := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-pgm.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-pgm.log -source $(SCRIPT_DIR)/$(DEV_PGM_SCRIPT) -notrace
+CFGMEM_PGM_CMD_LINE := -mode batch -journal $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-pgm.jou -log $(PLATFORM_BUILD_DIR)/$(CFG_NAME)-pgm.log -source $(SCRIPT_DIR)/$(CFGMEM_PGM_SCRIPT) -notrace
 
 #---
 define ip_bld_cmd
@@ -111,10 +113,11 @@ TRG_FILE       := $(call fixPath, $(abspath $(BIN_DIR)/$(TARGET_FILE_NAME).bit))
 #
 #     Build scripts dependencies
 #
-CMD_DEPS     := $(SCRIPT_DIR)/xilinx.mk makefile
-CMD_DEPS_PRJ := $(SCRIPT_DIR)/xilinx_prj_gen.tcl $(SCRIPT_DIR)/cfg_header_gen.tcl settings.tcl
-CMD_DEPS_BLD := $(SCRIPT_DIR)/xilinx_prj_build.tcl
-CMD_DEPS_PRG := $(SCRIPT_DIR)/xilinx_dev_pgm.tcl
+CMD_DEPS            := $(SCRIPT_DIR)/xilinx.mk makefile
+CMD_DEPS_PRJ        := $(SCRIPT_DIR)/xilinx_prj_gen.tcl $(SCRIPT_DIR)/cfg_header_gen.tcl settings.tcl
+CMD_DEPS_BLD        := $(SCRIPT_DIR)/xilinx_prj_build.tcl
+CMD_DEPS_PRG        := $(SCRIPT_DIR)/xilinx_dev_pgm.tcl
+CMD_DEPS_PRG_CFGMEM := $(SCRIPT_DIR)/xilinx_cfgmem_pgm.tcl
 
 ifneq ($(wildcard cfg_params.tcl),)
  CMD_DEPS_PRJ := $(CMD_DEPS_PRJ) cfg_params.tcl
@@ -131,7 +134,7 @@ OUT_IP     := $(abspath $(OUT_IP))
 #
 #    Main targets
 #
-.PHONY: all dev_pgm clean clean_all print-% test qs_vlog qs_gui qs_sim
+.PHONY: all dev_pgm cfgmem_pgm clean clean_all print-% test qs_vlog qs_gui qs_sim
 
 all:    build_prj
 
@@ -149,6 +152,12 @@ dev_pgm: $(TRG_FILE) $(CMD_DEPS_PRG)
 	rm -rf $(PLATFORM_BUILD_DIR)\$(CFG_NAME)-pgm*
 	$(SHELL_DIR)/$(PGM_SHELL) $(DEV_PGM_CMD_LINE) -tclargs $(TRG_BOARD) $(TRG_DEVICE) $(TRG_FILE)
 	rm -rf .Xil
+
+#---------------------------------------------------------------------
+cfgmem_pgm: $(TRG_FILE) $(CMD_DEPS_PRG_CFGMEM)
+	rm -rf $(PLATFORM_BUILD_DIR)\$(CFG_NAME)-pgm*
+	$(SHELL_DIR)/$(PGM_SHELL) $(CFGMEM_PGM_CMD_LINE) -tclargs $(TRG_BOARD) $(TRG_DEVICE) $(TRG_CFGMEM) $(TRG_CFGMEM_SIZE) $(TRG_FILE)
+	rm -rf .Xil webtalk*
 
 #---------------------------------------------------------------------
 clean:
