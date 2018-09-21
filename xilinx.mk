@@ -114,13 +114,25 @@ TRG_FILE       := $(call fixPath, $(abspath $(BIN_DIR)/$(TARGET_FILE_NAME).bit))
 #     Build scripts dependencies
 #
 CMD_DEPS            := $(SCRIPT_DIR)/xilinx.mk makefile
-CMD_DEPS_PRJ        := $(SCRIPT_DIR)/xilinx_prj_gen.tcl $(SCRIPT_DIR)/cfg_header_gen.tcl settings.tcl
+CMD_DEPS_PRJ        := $(SCRIPT_DIR)/xilinx_prj_gen.tcl $(SCRIPT_DIR)/cfg_header_gen.tcl $(PRJ_DEPS)
 CMD_DEPS_BLD        := $(SCRIPT_DIR)/xilinx_prj_build.tcl
 CMD_DEPS_PRG        := $(SCRIPT_DIR)/xilinx_dev_pgm.tcl
 CMD_DEPS_PRG_CFGMEM := $(SCRIPT_DIR)/xilinx_cfgmem_pgm.tcl
 
 ifneq ($(wildcard cfg_params.tcl),)
  CMD_DEPS_PRJ := $(CMD_DEPS_PRJ) cfg_params.tcl
+endif
+
+ifneq ($(wildcard prologue.tcl),)
+ CMD_DEPS_PRJ := $(CMD_DEPS_PRJ) prologue.tcl
+endif
+
+ifneq ($(wildcard epilogue.tcl),)
+ CMD_DEPS_PRJ := $(CMD_DEPS_PRJ) epilogue.tcl
+endif
+
+ifneq ($(wildcard settings.tcl),)
+ CMD_DEPS_PRJ := $(CMD_DEPS_PRJ) settings.tcl
 endif
 
 #-------------------------------------------------------------------------------
