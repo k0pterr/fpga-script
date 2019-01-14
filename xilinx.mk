@@ -206,7 +206,7 @@ $(PRJ_FILE): $(CMD_DEPS) $(CMD_DEPS_PRJ) $(OUT_IP) | $(PLATFORM_BUILD_DIR)
 PERCENT = %
 $(OUT_IP): % : $$(filter $$(PERCENT)$$(notdir $$*), $$(CFG_IP)).tcl | $(OUT_IP_DIR)/simlib
 	@echo Generate IP cores
-	$(call ip_bld_cmd, $^ ) -tclargs $^ $@ $(DEVICE) $(IP_LIB_DIR)
+	$(call ip_bld_cmd, $^ ) -tclargs $(SCRIPT_DIR) $^ $@ $(DEVICE) $(IP_LIB_DIR)
 	cd $(OUT_IP_DIR); $(SIM_SHELL) -c -do "set IP_LIB_DIR $(IP_LIB_DIR)" -do $<
 
 #---------------------------

@@ -29,10 +29,11 @@ proc ipGenEpilogue { ipCoreName ipCoreOutDir } {
 set DEBUG_INFO 0
 
 #-----------------------------------
-set IP_CFG            [lindex $argv 0]
-set IP_OUT            [lindex $argv 1]
-set DEVICE            [lindex $argv 2]
-set IP_LIB_DIR        [lindex $argv 3]
+set SCRIPT_DIR        [lindex $argv 0]
+set IP_CFG            [lindex $argv 1]
+set IP_OUT            [lindex $argv 2]
+set DEVICE            [lindex $argv 3]
+set IP_LIB_DIR        [lindex $argv 4]
 
 #-----------------------------------
 set CFG_DIR [pwd]

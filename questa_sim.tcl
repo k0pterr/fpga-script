@@ -192,7 +192,7 @@ proc show_res { res } {
 #     Run service tasks
 #
 source ${SCRIPT_DIR}/cfg_header_gen.tcl
-cfg_header_gen ${CFG_DIR}
+cfg_header_gen ${SCRIPT_DIR} ${CFG_DIR}
 #-------------------------------------------------------------------------------
 if {[file exists ${CFG_DIR}/${PROLOGUE_SCRIPT}] == 1} {
     source ${CFG_DIR}/${PROLOGUE_SCRIPT}

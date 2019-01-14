@@ -1,8 +1,6 @@
 #-------------------------------------------------------------------------------
-proc cfg_header_gen {CFG_DIR} {
+proc cfg_header_gen {SCRIPT_DIR CFG_DIR} {
 #-----------------------------------
-    global env
-    
     set DEBUG_INFO 0
     
     #-----------------------------------
@@ -27,8 +25,18 @@ proc cfg_header_gen {CFG_DIR} {
     puts $prjDefFile [format "`define CFG_NAME_[string toupper [file tail $CFG_DIR]]"];
     puts $prjDefFile [format ""];
     if {[file exists $CFG_PARAMS_FILE] == 1} {
-        puts $prjDefFile [format "//--- user define section"];
+        puts $prjDefFile [format "//--- user defined section\n"];
+
         source $CFG_PARAMS_FILE
+        
+        if { [info exists config_params] } {
+            foreach i ${config_params} {
+                set name  [lindex ${i} 0]
+                set value [lindex ${i} 1]
+
+                puts $prjDefFile [format "`define ${name} %[expr 28 - [string length ${name}]]s"  ${value}];
+            }
+        }
     }
     #-----------------------------------
     
