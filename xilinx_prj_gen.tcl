@@ -141,7 +141,7 @@ set src_sdc [lsearch -all -inline $srcFileList $sfx_sdc]
 set src_xdc [lsearch -all -inline $srcFileList $sfx_xdc] 
 
 #-----------------------------------
-cfg_header_gen $CFG_DIR
+cfg_header_gen $SCRIPT_DIR $CFG_DIR
 
 #-----------------------------------
 if {[file exists ${CFG_DIR}/${PROLOGUE_SCRIPT}] == 1} {
