@@ -34,7 +34,7 @@ proc cfg_header_gen {SCRIPT_DIR CFG_DIR} {
                 set name  [lindex ${i} 0]
                 set value [lindex ${i} 1]
 
-                puts $prjDefFile [format "`define ${name} %[expr 28 - [string length ${name}]]s"  ${value}];
+                puts $prjDefFile [format "`define ${name} %[expr 36 - [string length ${name}]]s"  ${value}];
             }
         }
     }
