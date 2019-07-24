@@ -15,7 +15,7 @@ proc defparam {name value {p config_params} } {
     lappend par ${item}
 }
 
-proc get_param {name {p config_params} } {
+proc getparam {name {p config_params} } {
     
     upvar $p par
     
