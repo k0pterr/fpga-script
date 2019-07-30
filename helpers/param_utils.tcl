@@ -22,3 +22,15 @@ proc getparam {name {p config_params} } {
     return  [lindex [lsearch -index 0 -inline $par $name] 1]
 }
 
+proc param_exists {name {p config_params} } {
+
+    upvar $p par
+
+    set res [lsearch -index 0 $par $name]
+    if {$res < 0} {
+        return false 
+    } else {
+        return true
+    }
+}
+
