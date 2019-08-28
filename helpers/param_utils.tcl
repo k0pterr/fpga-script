@@ -7,6 +7,11 @@ proc clog2 {n} {
     return $res
 }
 
+proc bits {x} {
+    set n [clog2 ${x}]
+    return [expr $x == (1 << ${n}) ? ${n} + 1 : ${n}]
+}
+
 proc defparam {name value {p config_params} } {
     
     upvar $p par
