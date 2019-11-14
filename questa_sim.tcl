@@ -176,6 +176,12 @@ proc r { { wave_ena 1 } } {
     view transcript
 }
 #-------------------------------------------------------------------------------
+proc rr {} {
+    transcript file ""; 
+    transcript file transcript;
+    r
+}
+#-------------------------------------------------------------------------------
 proc show_res { res } {
     global CFG_DIR
 
