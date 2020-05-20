@@ -11,7 +11,7 @@
 #
 CFG_NAME           := $(notdir $(CURDIR))
 				   
-SCRIPT_DIR         := $(REF_DIR)/script
+SCRIPT_DIR         := $(REF_DIR)/.script
 IP_LIB_DIR         := $(REF_DIR)/ip/xilinx
 BIN_DIR            := $(REF_DIR)/bin
 BUILD_DIR          := $(REF_DIR)/build
