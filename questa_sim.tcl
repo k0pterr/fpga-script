@@ -89,6 +89,7 @@ if {[info exists WorkLib]} {
 if {[info exists TimeResolution]} {
         quietly append vsim_flags " -t $TimeResolution";
 }
+quietly append vsim_flags " " ${VSIM_FLAGS}
 quietly append vsim_flags " -wlf func.wlf";
 quietly append vsim_flags " -quiet";
 quietly append vsim_flags " " $OptimizedDesignName;

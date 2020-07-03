@@ -252,6 +252,7 @@ $(SIM_HANDOFF): | $(PLATFORM_FSIM_DIR)
 	@echo set SIM_INC_DIRS [list $(foreach d, $(SIM_INC_DIRS), {$(abspath $d)})] >> $(PLATFORM_FSIM_DIR)/$(SIM_HANDOFF)
 	@echo set VLOG_FLAGS   [list $(foreach f, $(VLOG_FLAGS), {$f})]              >> $(PLATFORM_FSIM_DIR)/$(SIM_HANDOFF)
 	@echo set VOPT_FLAGS   [list $(foreach f, $(VOPT_FLAGS), {$f})]              >> $(PLATFORM_FSIM_DIR)/$(SIM_HANDOFF)
+	@echo set VSIM_FLAGS   [list $(foreach f, $(VSIM_FLAGS), {$f})]              >> $(PLATFORM_FSIM_DIR)/$(SIM_HANDOFF)
 
 #---------------------------------------------------------------------
 qs_vlog: $(SIM_HANDOFF) $(SIM_WLIB_DIR) $(OUT_IP)
